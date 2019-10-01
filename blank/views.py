@@ -1,17 +1,19 @@
 from django.http import HttpResponse
 from django.template import loader
-from .forms import UploadFileForm , signup , signin ,PasswordChangeForm
+from .forms import UploadFileForm , signup , signin
 from django.http import HttpResponseRedirect
 from .filehandler import handle_uploaded_file
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-
+from django.contrib.auth.forms import PasswordChangeForm ,PasswordResetForm
+from django.contrib.auth.views import PasswordChangeView , PasswordResetView 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 import glob
-
+from .dtrees import classifier
+files=[(i,v.rsplit("\\")[1]) for i,v in enumerate(glob.glob("blank/static/tmp/*"))]
 def index(request):
     template=loader.get_template("blank/index.html")
     return HttpResponse(template.render(request))
@@ -37,7 +39,7 @@ def sign_up(request):
         if form.is_valid() and request.POST['password']==request.POST['cnf_password']:
             user = User.objects.create_user(request.POST['username'], request.POST['mail'], request.POST['password'])
             user.save()
-            return HttpResponseRedirect('blank/login')
+            return HttpResponseRedirect('login')
     else:
         form = signup()
     return render(request, 'blank/auth.html', {'form': form})
@@ -59,17 +61,41 @@ def upload_file(request):
             return render(request, 'blank/result.html', {'result': "success"})
     else:
         form = UploadFileForm()
-    return render(request, 'blank/upload.html', {'form': form,"files":[i.rsplit("\\")[1] for i in glob.glob("blank/static/tmp/*")]})
-def frget_pswd(request):
+    return render(request, 'blank/upload.html', {'form': form,"files":files})
+def change_pass(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.POST)#, data=request.POST
+        form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
-            update_session_auth_hash(request, request.user)
-            return render(request, 'blank/result.html', {'result': "mail sent to your email"})
+            form.save()
+            update_session_auth_hash(request, request.POST)
+            return HttpResponse("password changed")
     else:
-        form = PasswordChangeForm()
-    return render(request, 'blank/result.html', {'result': form})
+        template=loader.get_template("blank/forget_pass.html")
+        form = PasswordChangeForm(request.user)
+    return HttpResponse(template.render({"form":form}))
 
+def forget_pass(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, request.POST)
+            return HttpResponse("password changed")
+    else:
+        form = PasswordResetForm()
+    return #PasswordResetView(request,template_name='blank/result_form.html',email_template_name='blank/result_email.html',subject_template_name='blank/result_email.html')
+def train_data(request,choice):
+    validated=login_verify(request)
+    if(validated!=1):
+        return validated
+    else:
+        classifier(files[choice][1])
+        template=loader.get_template("blank/card.html")
+        txt=open("blank/static/output/result.txt","r")
+        text=txt.readlines()
+        txt.close()
+        del txt
+        return HttpResponse(template.render({"file":files[choice][1],"text":text}))
 def login_verify(request):
     if(request.user.is_authenticated):
         return 1

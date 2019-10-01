@@ -18,18 +18,37 @@
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .container-fluid{
+        padding:unset;
+      }
+      .breadcrumb{
+        background-color: cadetblue;
+      }
+      .upload_form{
+        background: darkcyan;
+        padding-bottom: 2em;
+      }
+      .btn-floating.halfway-fab {
+        border-radius: 5px;
+        position: absolute;
+        right: 4px;
+        bottom: 3px;
+            }
+    </style>
 	</head>
 	<body>
         <div class="container-fluid" >
             <div class="row">
-                <div class="col-md-4" >
+                <div class="col-md-4 upload_form" >
                     <div class="breadcrumb" >
-                      <div class="list-group">
-                      {% for i in files %}
-                      <a href="#" class="list-group-item">{{i}}</a>
+                      <div class="list-group" style="color:black;">
+                      {% for i,v in files %}
+                      <div class="list-group-item">{{v}}<a href="#" link="train_dt/{{i}}" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a></div>
                       {% endfor %}
                       </div>
+                      
                     </div>
                         <form method="POST" class="post-form" enctype="multipart/form-data">
                             {% csrf_token %} 
@@ -48,24 +67,16 @@
                 </div>
                 <div class="col-md-8">
                   <div class="row">
-                    <div class="col s12 m8">
-                      <div class="card">
-                        <div class="card-image">
-                          <img src="{% static 'tmp/output/report.png' %}">
-                          
-                          <span class="card-title" style="position:inherit;color:black">Card Title</span>
-                          <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
-                        </div>
-                        <div class="card-content">
-                          <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
-                        </div>
-                      </div>
-                    </div>
+                    
                   </div>
                             
                 </div>
             </div>
         </div>
+        <script>
+          $(".material-icons").click(function(){""+$.get($(this).parent().attr("link"),function(data){$($(".row")[1]).append(data)})})
+          //$(".material-icons").click(function(){f=document.createElement("iframe");$(f).attr({class:"col s12 m6","style":"border-style:hidden;","href":""+$(this).parent().attr("link")});$($(".row")[1]).append(f)})
+        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     </body>
 </html>

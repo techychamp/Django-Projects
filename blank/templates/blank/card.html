@@ -1,0 +1,17 @@
+{% load static %}
+
+<div class="col s12 m6">
+  <div class="card">
+    <div class="card-image">
+      <img src="{% static 'output/report.png' %}">
+      
+      <span class="card-title" style="position:inherit;color:black">{{file}}</span>
+      
+    </div>
+    <div class="card-content">
+      {% for i in text %}
+      <p>{{i}}</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
