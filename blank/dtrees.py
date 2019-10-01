@@ -27,7 +27,7 @@ class classifier:
         self.file=file
         self.dataset = pd.read_csv("blank/static/tmp/"+self.file)
         self.feature_cols=[i for i in (self.dataset.head(0).keys())[2:]]
-        self.X = self.dataset.iloc[:, 2:32].values
+        self.X = self.dataset.iloc[:, 2:].values
         self.Y = self.dataset.iloc[:, 1].values
         #print(self.dataset.head(),file=self.out)
     def changer(self):

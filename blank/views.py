@@ -4,10 +4,9 @@ from .forms import UploadFileForm , signup , signin
 from django.http import HttpResponseRedirect
 from .filehandler import handle_uploaded_file
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm ,PasswordResetForm
-from django.contrib.auth.views import PasswordChangeView , PasswordResetView 
+from django.contrib.auth.views import PasswordChangeView , PasswordResetView ,PasswordResetConfirmView,PasswordChangeDoneView,PasswordResetDoneView,PasswordResetCompleteView
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
@@ -18,8 +17,7 @@ def index(request):
     template=loader.get_template("blank/index.html")
     return HttpResponse(template.render(request))
 def my_view(request):
-    validated=login_verify(request)
-    if(validated==1):
+    if(request.user.is_authenticated):
         return HttpResponseRedirect('/blank/upload')
     if request.method == 'POST':
         form = signin(request.POST)
@@ -74,16 +72,7 @@ def change_pass(request):
         form = PasswordChangeForm(request.user)
     return HttpResponse(template.render({"form":form}))
 
-def forget_pass(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, request.POST)
-            return HttpResponse("password changed")
-    else:
-        form = PasswordResetForm()
-    return #PasswordResetView(request,template_name='blank/result_form.html',email_template_name='blank/result_email.html',subject_template_name='blank/result_email.html')
+
 def train_data(request,choice):
     validated=login_verify(request)
     if(validated!=1):
@@ -100,4 +89,4 @@ def login_verify(request):
     if(request.user.is_authenticated):
         return 1
     else:
-        return HttpResponseRedirect('login')
+        return my_view(request)

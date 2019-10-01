@@ -5,12 +5,12 @@
     <div class="card-image">
       <img src="{% static 'output/report.png' %}">
       
-      <span class="card-title" style="position:inherit;color:black">{{file}}</span>
+      <a class="card-title" href="{% static 'output/result.dot.pdf' %}" download="result.pdf" style="position:inherit;color:black">{{file}}</a>
       
     </div>
     <div class="card-content">
       {% for i in text %}
-      <p>{{i}}</p>
+      <pre>{{i}}</pre>
       {% endfor %}
     </div>
   </div>
