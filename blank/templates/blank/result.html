@@ -13,11 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <form method="post">
-      {% csrf_token %}
-      Someone asked for password reset for email {{ email }}. Follow the link below:
-      {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
-    <button type="submit">submit</button>
+    {{result}}
   </form>
   </body>
 </html>

@@ -47,7 +47,7 @@ def logout_view(request):
     if(validated!=1):
         return validated
     logout(request)
-    return HttpResponse("logged out")
+    return my_view(request)
 def upload_file(request):
     validated=login_verify(request)
     if(validated!=1):
@@ -55,8 +55,10 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
+            global files
             handle_uploaded_file(request.FILES['file'])
-            return render(request, 'blank/result.html', {'result': "success"})
+            files=[(i,v.rsplit("\\")[1]) for i,v in enumerate(glob.glob("blank/static/tmp/*"))]
+            return render(request, 'blank/upload.html', {'form': form,"files":files})
     else:
         form = UploadFileForm()
     return render(request, 'blank/upload.html', {'form': form,"files":files})
